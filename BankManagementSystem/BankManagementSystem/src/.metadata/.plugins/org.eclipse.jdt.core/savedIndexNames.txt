@@ -1,0 +1,3 @@
+INDEX VERSION 1.131+C:\Users\wikap\OneDrive\Desktop\Code\IUS\INFO-C210\BankManagementSystem\.metadata\.plugins\org.eclipse.jdt.core
+398997195.index
+4288141048.index

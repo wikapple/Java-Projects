@@ -1,0 +1,93 @@
+package bankmanagementsystem;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+abstract class AccountTest {
+	//Data Fields
+	private int accountNumber;
+	private BigDecimal balance;
+	private int customerID;
+	private String customerName;
+	
+	//Constructors
+	AccountTest(int accountNumber, BigDecimal initialDeposit, int customerID, String customerName){
+		this.accountNumber = accountNumber;
+		initialDeposit.setScale(2, RoundingMode.HALF_UP);
+		this.balance = new BigDecimal(initialDeposit.toString());
+		this.customerID = customerID;
+		this.customerName = customerName;
+	}
+	//Accessors
+	public int getAccountNumber(){
+		return this.accountNumber;
+	}
+	
+	public BigDecimal getBalance() {
+		return this.balance;
+	}
+	public int getCustomerID() {
+		return this.customerID;
+	}
+	public String getCustomerName() {
+		return this.customerName;
+	}
+	
+	//setters
+	public void setBalance(BigDecimal newBalance) {
+		this.balance = new BigDecimal(newBalance.toString());
+		balance.setScale(2, RoundingMode.HALF_UP);
+	}
+	
+	public void setCustomerID(int newCustomerID) {
+		this.customerID = newCustomerID;
+	}
+	public void setCustomerName(String newName) {
+		this.customerName = newName;
+	}
+	
+	public boolean depositFunds(BigDecimal depositAmount) {
+		depositAmount.setScale(2, RoundingMode.FLOOR);
+		if(depositAmount.compareTo(new BigDecimal(0)) > 0) {
+		this.balance.add(depositAmount);
+		return true;
+		}else {
+			return false;
+		}
+	}
+	
+	public boolean withdrawFunds(BigDecimal withdrawAmount) {
+		withdrawAmount.setScale(2, RoundingMode.HALF_UP);
+		if(withdrawAmount.compareTo(this.balance) >= 0) {
+			this.balance.subtract(withdrawAmount);
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
+	public void monthReset() {
+		
+	}
+	
+	@Override
+	public String toString() {
+		String value = "Account Number: " + this.accountNumber + "\tAccount Balance: " + this.balance;
+		value += "\nCustomer ID: " + this.customerID + "\tCustomer Name: " + this.customerName + "\n";
+		return value;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(!(obj instanceof Account)) {
+			return false;
+		}
+		if(this.accountNumber == ((Account)obj).getAccountNumber()) {
+			return true;
+			
+		}else {
+			return false;
+		}
+	}
+
+}

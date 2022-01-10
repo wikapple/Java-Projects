@@ -1,0 +1,293 @@
+package bankmanagementsystem;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+
+class BankOperator {
+	AccountLedger bankLedger;
+	
+	BankOperator(AccountLedger bankLedger){
+		this.bankLedger = bankLedger;
+	}
+	
+	public void runMenu() {
+		boolean menuLoop = true;
+		
+		do {
+			System.out.println("Press enter to continue");
+			UserInput.divder();
+			printMainMenu();
+			int response = UserInput.enterNumber("Enter a number for a corresponding menu option", 0, 9);
+			switch(response) {
+				case 1:
+					createCheckingAccount();
+					break;
+				case 2:
+					createGoldAccount();
+					break;
+				case 3:
+					createRegularAccount();
+					break;
+				case 4:
+					depositFunds();
+					break;
+				case 5:
+					withdrawFunds();
+					break;
+				case 6:
+					displayAccountInfo();
+					break;
+				case 7:
+					removeAccount();
+					break;
+				case 8:
+					applyEndOfMonth();
+					break;
+				case 9:
+					displayBankStats();
+					break;
+				case 0:
+					System.out.println("Closing menu...");
+					menuLoop = false;
+					break;
+				default:
+					System.out.println("Invalid entry");
+					break;
+			}
+		}while(menuLoop);
+		
+		System.out.println("Menu closed");
+	}
+	
+	private static void printMainMenu() {
+		String menu = "\t\tMain Menu\n1: Create a Checking account\n2: Create a Gold account\n3: Create a Regular account\n4: Enter a deposit\n"
+				+ "5: Make a withdraw\n6: Display Account Information\n7: Remove an account\n8: Apply end of the month account upates\n"
+				+ "9: Display bank statistics\n0: Exit";
+		
+		System.out.println(menu);
+	}
+
+	//Creates a checking account
+	private void createCheckingAccount() {
+		String customerName = UserInput.enterName("Enter customer's name");
+		int customerID = UserInput.enterNumber("Enter customer ID", 1, 9999999);
+		double initialDepositAsDouble = (double)UserInput.enterNumber("Enter initial deposit value", 0, 9999999);
+		BigDecimal initialDeposit = new BigDecimal(initialDepositAsDouble);
+		initialDeposit.setScale(2, RoundingMode.HALF_UP);
+		
+		if(bankLedger.addCheckingAccount(initialDeposit, customerID, customerName)) {
+			System.out.println("Account created");
+		}else {
+			System.out.println("Error, account not created");
+		}
+		
+		UserInput.divder();
+	}
+	
+	//Creates gold account
+	private void createGoldAccount() {
+		String customerName = UserInput.enterName("Enter customer's name");
+		int customerID = UserInput.enterNumber("Enter customer ID", 1, 9999999);
+		double initialDepositAsDouble = (double)UserInput.enterNumber("Enter initial deposit value", 0, 9999999);
+		BigDecimal initialDeposit = new BigDecimal(initialDepositAsDouble);
+		initialDeposit.setScale(2, RoundingMode.HALF_UP);
+		
+		if(bankLedger.addGoldAccount(initialDeposit, customerID, customerName)) {
+			System.out.println("Account created");
+		}else {
+			System.out.println("Error, account not created");
+		}
+		
+		UserInput.divder();
+	}
+	
+	private void createRegularAccount() {
+		String customerName = UserInput.enterName("Enter customer's name");
+		int customerID = UserInput.enterNumber("Enter customer ID", 1, 9999999);
+		double initialDepositAsDouble = (double)UserInput.enterNumber("Enter initial deposit value", 0, 9999999);
+		BigDecimal initialDeposit = new BigDecimal(initialDepositAsDouble);
+		initialDeposit.setScale(2, RoundingMode.HALF_UP);
+		
+		if(bankLedger.addRegularAccount(initialDeposit, customerID, customerName)) {
+			System.out.println("Account created");
+		}else {
+			System.out.println("Error, account not created");
+		}
+		UserInput.divder();
+	}
+	
+	private void depositFunds() {
+		//find an account
+		Account thisAccount = searchForAnAccount();
+		
+		if(thisAccount == null) {
+			System.out.println("Deposit cancelled");
+			return;
+		}
+		
+		//Choose deposit amount
+		
+		double depositAmountAsDouble = (double)UserInput.enterNumber("Enter a deposit amount", 1, 999999);
+		BigDecimal depositAmount = new BigDecimal(depositAmountAsDouble);
+		depositAmount.setScale(2, RoundingMode.HALF_UP);
+		//desposit cash
+		
+		if(bankLedger.depositFunds(thisAccount.getAccountNumber(), depositAmount)) {
+			System.out.println("Deposit complete");
+		}else {
+			System.out.println("Deposit failed");
+		}
+		UserInput.divder();
+	}
+	
+	private void withdrawFunds() {
+		//find an account
+		Account thisAccount = searchForAnAccount();
+		
+		if(thisAccount == null) {
+			System.out.println("Deposit cancelled");
+			return;
+		}
+		
+		//Choose deposit amount
+		double withdrawAmount = (double)UserInput.enterNumber("Enter a withdraw amount", 1, 999999);
+		//withdraw cash
+		
+		if(bankLedger.withdrawFunds(thisAccount.getAccountNumber(), withdrawAmount)) {
+			System.out.println("withdraw complete");
+			
+		}else {
+			System.out.println("withdraw failed");
+		}
+		UserInput.divder();
+	}
+	
+	
+	private void displayAccountInfo() {
+		Account thisAccount = searchForAnAccount();
+		System.out.println(thisAccount);
+	}
+	
+	private void removeAccount() {
+		Account thisAccount = searchForAnAccount();
+		
+		if(bankLedger.removeAccount(thisAccount.getAccountNumber())) {
+			System.out.println("Account removed");
+			
+		}else {
+			System.out.println("Removal failed");
+		}
+	}
+	
+	private void applyEndOfMonth() {
+		UserInput.divder();
+		if(UserInput.yesOrNoQuestion("Are you sure you want to apply end of month updates? Action cannot be reversed.")) {
+			bankLedger.monthReset();
+			System.out.println("End of month account updates applied");
+			
+		}else {
+			System.out.println("End of month updates cancelled");
+		}
+	}
+	
+	private void displayBankStats() {
+		String stats = "\t\tBank Statistics:\n";
+		stats += "Sum of all accounts: " + bankLedger.sumOfAccounts() + "\tTotal Accounts: " + bankLedger.getNumberOfAccounts() + "\n";
+		stats += "Number of zero balance accounts: " + bankLedger.getAccountsWith0Balance().size() + "\tAverage Balance: " + bankLedger.getAverageValue() + "\n";
+		stats += "\t\tAccount with largest balance: \n" + bankLedger.getLargestValue();
+		System.out.println(stats);
+		UserInput.divder();
+	}
+	
+	private Account searchForAnAccount(){
+		boolean searchLoop = true;
+		Account thisAccount = null;
+		do {
+			System.out.println("\t\tSearch Options:");
+			int select = UserInput.enterNumber("1: Search by account number\n2: Search by customer name\n3: Search by customer ID\n0: Exit Search", 1, 3);
+			
+			switch (select){
+				
+				case 1:
+					int accountNumber = UserInput.enterNumber("Enter account number", 1, 999999);
+					thisAccount = bankLedger.searchByAccountNumber(accountNumber);
+					
+					if(thisAccount != null) {
+						System.out.println(thisAccount.toString());
+						
+						if(UserInput.yesOrNoQuestion("Do you want to use this account?")) {
+							searchLoop = false;
+						}
+					}else {
+						System.out.println("Account not found");
+					}
+					break;
+					
+				case 2:
+					String name = UserInput.enterName("Enter customer name");
+					ArrayList<Account> searchResult = bankLedger.searchAccountsByCustomerName(name);
+					
+					if(searchResult.size() > 0) {
+						thisAccount = selectAccountFromList(searchResult);
+						
+						if(thisAccount != null) {				
+							System.out.println(thisAccount.toString());
+							
+							if(UserInput.yesOrNoQuestion("Do you want to use this account?")) {
+								searchLoop = false;
+							}
+						}else {
+							System.out.println("Account not found");
+						}
+					}
+					break;
+					
+				case 3:
+					int customerID = UserInput.enterNumber("Enter customer ID", 1, 9999999);
+					ArrayList<Account> searchResult2 = bankLedger.searchAccountsByCustomerID(customerID);
+					
+					if(searchResult2.size() > 0) {
+						thisAccount = selectAccountFromList(searchResult2);
+						
+						if(thisAccount != null) {
+							System.out.println(thisAccount.toString());
+							
+							if(UserInput.yesOrNoQuestion("Do you want to use this account?")) {
+								searchLoop = false;
+							}
+						}else {
+							System.out.println("Account not found");
+						}
+					}
+					
+					break;
+				
+				case 0:
+					System.out.println("Search cancelled");
+					return null;
+				
+				default:
+					break;
+			}
+		}while(searchLoop);
+		
+		return thisAccount;
+	}
+	
+	private Account selectAccountFromList(ArrayList<Account> Accounts) {
+		if(Accounts.size() == 1) {
+			return Accounts.get(0);
+		}
+		
+		for(int i = 0 ; i < Accounts.size(); i++) {
+			System.out.println("Account"  + (i + 1) + ":");
+			System.out.println(Accounts.get(i));
+		}
+		int selection = UserInput.enterNumber("Enter the number that corresponds with the account you want to use (or press 0 to quit)", 1, Accounts.size());
+		if(selection > 0) {
+			return Accounts.get(selection-1);
+		}else {
+			return null;
+		}
+	}
+}

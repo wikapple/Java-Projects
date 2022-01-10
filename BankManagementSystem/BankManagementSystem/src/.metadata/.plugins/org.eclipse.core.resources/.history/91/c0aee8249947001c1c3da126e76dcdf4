@@ -1,0 +1,49 @@
+package bankmanagementsystem;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
+class RegularAccount extends Account{
+	//data fields
+	private double interestRate;
+	private BigDecimal monthlyFee;
+	
+	//constructor
+	RegularAccount(int accountNumber, BigDecimal initialDeposit, int customerID, String customerName){
+		super(accountNumber, initialDeposit, customerID, customerName);
+		this.interestRate = 0.06;
+		this.monthlyFee = new BigDecimal("10.00");
+	}
+	
+	//Accessor
+	public double getInterestRate() {
+		return this.interestRate;
+	}
+	public BigDecimal getMonthlyFee() {
+		return this.monthlyFee;
+	}
+	
+	@Override
+	public void monthReset() {
+		double monthlyInterestRate = this.interestRate / 12;
+		BigDecimal interestEarned = this.getBalance().multiply(BigDecimal.valueOf(monthlyInterestRate));
+		System.out.println("Interest earned: " + interestEarned.toString());
+		interestEarned.setScale(1, RoundingMode.HALF_UP);
+		System.out.println("Interest earned rounded: " + interestEarned.toString());
+		
+		this.depositFunds(interestEarned);
+		
+		System.out.println("Balance after interest earned deposited: " + this.getBalance());
+		
+		if(!(this.withdrawFunds(monthlyFee))){
+			this.setBalance(0);
+		}
+		System.out.println("Balance afdter monthly fee: " + this.getBalance());
+	}
+	@Override
+	public String toString() {
+		String value = "\t\tRegular Account\nInterest Rate: " + this.interestRate + "\tMonthly Fee: " + this.monthlyFee + "\n";
+		value += super.toString();
+		return value;
+	}
+}

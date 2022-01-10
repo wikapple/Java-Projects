@@ -1,0 +1,16 @@
+package bankmanagementsystem;
+
+import java.math.BigDecimal;
+
+public class Test {
+
+	public static void main(String[] args) {
+//		AccountLedger myBank = new AccountLedger();
+//		BankOperator newTeller = new BankOperator(myBank);
+//		newTeller.runMenu();
+		
+		BigDecimal myDeposit = new BigDecimal(50);
+		System.out.println(myDeposit.compareTo(new BigDecimal(0)));
+	}
+
+}
